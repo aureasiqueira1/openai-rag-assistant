@@ -48,15 +48,16 @@ export async function POST(req: Request) {
 
     const topScore = results?.[0]?.score ?? 0;
 
-    const SIMILARITY_THRESHOLD = 0.3;
+    const SIMILARITY_THRESHOLD = 0.2;
 
-    if (topScore <= SIMILARITY_THRESHOLD) {
+    if (topScore > SIMILARITY_THRESHOLD) {
       // 3️⃣ Usa a base de conhecimento
       fromKnowledgeBase = true;
       const context = results.map(r => r.text).join('\n');
 
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
+        max_tokens: 400,
         messages: [
           {
             role: 'system',
@@ -71,9 +72,11 @@ export async function POST(req: Request) {
 
       responseText = completion.choices[0].message.content || '';
     } else {
+      fromKnowledgeBase = false;
       // 4️⃣ Gera nova resposta com o modelo e salva no banco
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
+        max_tokens: 400,
         messages: [
           {
             role: 'system',
