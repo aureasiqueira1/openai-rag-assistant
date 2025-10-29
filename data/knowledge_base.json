@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Domain-Driven Design (DDD): Definição Central",
+    "text": "O Domain-Driven Design (DDD) é uma abordagem de desenvolvimento de software complexo que coloca o foco no domínio principal e na lógica do negócio. Ele enfatiza a colaboração estreita entre especialistas do domínio e desenvolvedores para criar um modelo que resolva problemas de negócios específicos.",
+    "source": "Arquitetura/DDD_Conceitos"
+  },
+  {
+    "title": "DDD: Aggregate Root (Raiz de Agregado)",
+    "text": "A Aggregate Root (Raiz de Agregado) é uma entidade específica que atua como porta de entrada e garante a consistência transacional de um agrupamento de entidades e Objetos de Valor dentro de um limite. Qualquer alteração externa ao Agregado deve passar obrigatoriamente pela Aggregate Root.",
+    "source": "Arquitetura/DDD_Padrões"
+  },
+  {
+    "title": "Padrões de Projeto: Factory Method",
+    "text": "O Factory Method é um padrão de criação que fornece uma interface para criar objetos em uma superclasse, mas permite que as subclasses alterem o tipo de objetos que serão criados. Isso promove o princípio do Open/Closed, desacoplando o cliente das classes concretas.",
+    "source": "Padrões/Criação"
+  },
+  {
+    "title": "Padrões de Projeto: Strategy",
+    "text": "O padrão Strategy (Estratégia) define uma família de algoritmos, encapsula cada um deles e os torna intercambiáveis. Ele permite que o cliente defina o comportamento em tempo de execução, alterando a estratégia a ser utilizada sem modificar a classe principal que a utiliza. É frequentemente usado para lidar com diferentes regras de negócio.",
+    "source": "Padrões/Comportamento"
+  },
+  {
+    "title": "Arquitetura de Software: Microsserviços",
+    "text": "Microsserviços é um estilo arquitetural que estrutura uma aplicação como uma coleção de serviços pequenos, independentes e fracamente acoplados, que são desenvolvidos, implantados e gerenciados de forma autônoma. Cada serviço foca em uma capacidade de negócio e pode usar sua própria tecnologia e base de dados, promovendo escalabilidade e resiliência.",
+    "source": "Arquitetura/Microservices"
+  },
+  {
+    "title": "API Design: Princípios REST",
+    "text": "APIs RESTful seguem seis restrições arquiteturais, sendo as mais notáveis a Arquitetura Cliente-Servidor (separação de responsabilidades), Statelessness (o servidor não armazena o estado da sessão do cliente) e Cacheable (respostas devem ser marcadas como cacheáveis ou não). A comunicação é tipicamente via HTTP com verbos padronizados (GET, POST, PUT, DELETE).",
+    "source": "API/RESTful"
+  },
+  {
+    "title": "TypeScript: O que é 'Utility Type' Partial",
+    "text": "O Utility Type 'Partial<T>' constrói um tipo com todas as propriedades de T definidas como opcionais. Isso é extremamente útil em cenários onde precisamos de um objeto que pode conter um subconjunto das propriedades do tipo original, como ao fazer um 'update' parcial em um registro.",
+    "source": "Linguagem/TypeScript"
+  }
+]
