@@ -41,6 +41,18 @@ export async function POST(req: Request) {
           index: 'default', // nome do índice real no Atlas
         },
       },
+      {
+        // 🔑 ESSENCIAL: Projetar o score e a chave de texto correta
+        $project: {
+          _id: 0,
+          // O campo 'text' é onde o conteúdo foi armazenado, e o Mongoose o mapeia.
+          // O LangChain o salvou usando a chave 'text' (no seu código de populacão).
+          text: '$text',
+          source: '$source',
+          // 💡 ESTA É A CHAVE para obter o score no Mongoose/Aggregation
+          score: { $meta: 'vectorSearchScore' },
+        },
+      },
     ]);
 
     let responseText = '';
@@ -49,6 +61,12 @@ export async function POST(req: Request) {
     const topScore = results?.[0]?.score ?? 0;
 
     const SIMILARITY_THRESHOLD = 0.75;
+
+    console.log(`Top Score encontrado: ${topScore}`);
+
+    if (results && results.length > 0) {
+      console.log(`Top Chunk: ${results[0].text.substring(0, 50)}...`);
+    }
 
     if (topScore > SIMILARITY_THRESHOLD) {
       // 3️⃣ Usa a base de conhecimento
@@ -61,16 +79,17 @@ export async function POST(req: Request) {
         messages: [
           {
             role: 'system',
-            content: 'Você é um assistente técnico especializado em desenvolvimento de software.',
+            content:
+              'Você é um assistente técnico especializado em desenvolvimento de software. Use APENAS o conteúdo do contexto fornecido para responder à pergunta do usuário. Se o contexto for insuficiente, diga "Sinto muito, não encontrei informações relevantes na minha base de conhecimento para responder a esta pergunta."',
           },
           {
             role: 'user',
-            content: `Use o conteúdo do contexto para responder a pergunta do usuário :\n\n${context}\n\nPergunta: ${question}`,
+            content: `Contexto:\n\n${context}\n\nPergunta: ${question}`,
           },
         ],
       });
 
-      responseText = completion.choices[0].message.content || '';
+      responseText = completion.choices[0].message.content || 'Resposta não gerada.';
     } else {
       fromKnowledgeBase = false;
       // 4️⃣ Gera nova resposta com o modelo e salva no banco
@@ -81,7 +100,7 @@ export async function POST(req: Request) {
           {
             role: 'system',
             content:
-              'Você é um assistente técnico especializado em desenvolvimento de software. Responda com clareza e base técnica sólida.',
+              'Você é um assistente técnico especializado em desenvolvimento de software. Responda com clareza e base técnica sólida. Seja objetivo',
           },
           { role: 'user', content: question },
         ],
@@ -106,6 +125,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       answer: responseText,
       fromKnowledgeBase,
+      topScore,
     });
   } catch (error: unknown) {
     console.error('Erro ao responder pergunta:', error);
