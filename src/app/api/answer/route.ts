@@ -60,7 +60,7 @@ export async function POST(req: Request) {
 
     const topScore = results?.[0]?.score ?? 0;
 
-    const SIMILARITY_THRESHOLD = 0.75;
+    const SIMILARITY_THRESHOLD = 0.68;
 
     console.log(`Top Score encontrado: ${topScore}`);
 
