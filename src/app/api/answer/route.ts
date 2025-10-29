@@ -64,7 +64,7 @@ export async function POST(req: Request) {
           },
           {
             role: 'user',
-            content: `Baseado nas informações abaixo, responda de forma clara e direta:\n\n${context}\n\nPergunta: ${question}`,
+            content: `Use o conteúdo do contexto para responder a pergunta do usuário :\n\n${context}\n\nPergunta: ${question}`,
           },
         ],
       });
