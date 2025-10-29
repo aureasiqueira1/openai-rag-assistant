@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 
     const topScore = results?.[0]?.score ?? 0;
 
-    const SIMILARITY_THRESHOLD = 0.2;
+    const SIMILARITY_THRESHOLD = 0.75;
 
     if (topScore > SIMILARITY_THRESHOLD) {
       // 3️⃣ Usa a base de conhecimento
