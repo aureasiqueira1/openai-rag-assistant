@@ -3,30 +3,30 @@ import { MongoDBAtlasVectorSearch } from '@langchain/mongodb';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import fs from 'fs';
-import mongoose from 'mongoose';
+import { MongoClient } from 'mongodb';
 import { NextResponse } from 'next/server';
 import path from 'path';
+import { IKnowledgeChunk } from '../../../models/KnowledgeChunk';
 
-const MONGODB_URI = process.env.MONGODB_URI!;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
+const uri = process.env.MONGODB_URI!;
+const client = new MongoClient(uri);
 
 export async function POST() {
   try {
-    await mongoose.connect(MONGODB_URI);
+    await client.connect();
+    const db = client.db(); // banco padrão do URI
+    const collection = db.collection('knowledgebase');
 
     const filePath = path.join(process.cwd(), 'data', 'knowledge_base.json');
-    const rawJsonData: { title: string; text: string; source: string }[] = JSON.parse(
-      fs.readFileSync(filePath, 'utf-8')
-    );
+    const rawJsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 
     const embeddings = new OpenAIEmbeddings({
       modelName: 'text-embedding-3-large',
-      openAIApiKey: OPENAI_API_KEY,
+      openAIApiKey: process.env.OPENAI_API_KEY!,
     });
 
-    // 1️⃣ Fragmentação dos dados
-    const docsToSplit = rawJsonData.map(
-      item =>
+    const docs = rawJsonData.map(
+      (item: IKnowledgeChunk) =>
         new Document({
           pageContent: `${item.title}: ${item.text}`,
           metadata: { source: item.source },
@@ -37,13 +37,13 @@ export async function POST() {
       chunkSize: 1000,
       chunkOverlap: 200,
     });
-    const chunks = await splitter.splitDocuments(docsToSplit);
+    const chunks = await splitter.splitDocuments(docs);
 
     console.log(`Fragmentos criados: ${chunks.length}`);
 
     // 2️⃣ Criação da store no MongoDB Atlas
     const vectorStore = new MongoDBAtlasVectorSearch(embeddings, {
-      collection: mongoose.connection.collection('knowledgebase'),
+      collection,
       indexName: 'default',
       textKey: 'text',
       embeddingKey: 'embedding',
@@ -54,9 +54,9 @@ export async function POST() {
 
     console.log('✅ Base de conhecimento carregada com sucesso!');
 
-    await mongoose.disconnect();
+    await client.close();
 
-    return NextResponse.json({ message: 'Base de conhecimento carregada com sucesso!' });
+    return NextResponse.json({ message: '✅ Base carregada com sucesso!' });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
